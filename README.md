@@ -1,2 +1,3 @@
-# car-locating
-Simple React Native app to demonstrate car locating functionality for a client
+# README #
+
+Simple demo app to show to a client
