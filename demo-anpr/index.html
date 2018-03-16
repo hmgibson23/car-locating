@@ -1,0 +1,173 @@
+
+<!-- <form id="upload-form" method="POST" enctype="multipart/form-data"> -->
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+     .btn-file {
+         position: relative;
+         overflow: hidden;
+     }
+
+     .btn-file input[type=file] {
+         position: absolute;
+         top: 0;
+         right: 0;
+         min-width: 100%;
+         min-height: 100%;
+         font-size: 100px;
+         text-align: right;
+         filter: alpha(opacity=0);
+         opacity: 0;
+         outline: none;
+         background: white;
+         cursor: inherit;
+         display: block;
+     }
+
+     .holder {
+         text-align: center;
+         font-size: 2em;
+     }
+
+    </style>
+
+
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script>
+
+     function readFile(file) {
+         var reader = new FileReader();
+         reader.onloadend = function () {
+             processFile(reader.result, file.type);
+         }
+         reader.onerror = function () {
+             alert('There was an error reading the file!');
+         }
+         reader.readAsDataURL(file);
+     }
+
+
+     function toggleLoader() {
+         $('#loader').toggle();
+     }
+
+     function processFile(dataURL, fileType) {
+	     var maxWidth = 800;
+	     var maxHeight = 800;
+
+	     var image = new Image();
+	     image.src = dataURL;
+	     image.onload = function () {
+		     var width = image.width;
+		     var height = image.height;
+		     var shouldResize = (width > maxWidth) || (height > maxHeight);
+		     if (!shouldResize) {
+			     sendFile(dataURL);
+			     return;
+		     }
+		     var newWidth;
+		     var newHeight;
+		     if (width > height) {
+			     newHeight = height * (maxWidth / width);
+			     newWidth = maxWidth;
+		     } else {
+			     newWidth = width * (maxHeight / height);
+			     newHeight = maxHeight;
+		     }
+		     var canvas = document.createElement('canvas');
+		     canvas.width = newWidth;
+		     canvas.height = newHeight;
+		     var context = canvas.getContext('2d');
+		     context.drawImage(this, 0, 0, newWidth, newHeight);
+		     dataURL = canvas.toDataURL(fileType);
+		     sendFile(dataURL);
+	     };
+
+	     image.onerror = function () {
+		     alert('There was an error processing your file!');
+	     };
+     }
+
+     function sendFile(fileData) {
+         toggleLoader();
+	     $.ajax({
+		     type: 'POST',
+		     url: 'http://35.196.6.211:8080/getNumber',
+		     data: fileData,
+		     contentType: false,
+		     processData: false,
+             mimeType:"multipart/form-data",
+		     success: function (data) {
+                 var res = JSON.parse(data)
+                 toggleLoader();
+                 $('#response-holder').html(res.number_plate)
+		     },
+		     error: function (data) {
+			     alert('There was an error uploading your file!');
+		     }
+	     });
+     }
+    </script>
+</head>
+<body>
+    <div class="container container-fluid">
+        <h1>Stygos Test ANPR Algorithm</h1>
+
+        <div id="main-container">
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="btn btn-primary btn-file">
+                        <span id="upload-button">
+                            Choose image...
+                        </span>
+                        <input type="file" name="imagefile" id="imagefile" accept="image/*;capture=camcorder"/>
+                    </label>
+                    <span id="filename-output"></span>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="jumbotron holder">
+                        <div id="loader" style="display: none;">
+                            <div class="row">
+                                <div class="col-md-12" style="font-size: 25px;">
+                                    Please wait. This can take up to 20 seconds...
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <i class="fa fa-spinner fa-spin" style="font-size:1.5em;"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="response-holder">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <script>
+         var $inputField = $('#imagefile');
+
+         $inputField.on('change', function (e) {
+             var file = e.target.files[0];
+             if (file) {
+                 if (/^image\//i.test(file.type)) {
+                     $('#filename-output').html(file.name);
+                     $('#upload-button').html("Choose a different file...");
+                     $('#response-holder').html('');
+                     readFile(file);
+                 } else {
+                     alert('Not a valid image!');
+                 }
+             }
+         });
+        </script>
+</body>

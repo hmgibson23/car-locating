@@ -1,0 +1,13 @@
+export const FETCH_VEHICLE = 'fetch-vehicle';
+export const FETCH_VEHICLE_SUCCESS = 'fetch-vehicle-success';
+export const FETCH_VEHICLE_ERROR = 'fetch-vehicle-error';
+export const SAVE_VEHICLE = 'save-vehicle';
+export const SAVE_VEHICLE_LOCAL_SUCCESS = 'save-vehicle-local-success';
+export const SAVE_VEHICLE_REMOTE_SUCCESS = 'save-vehicle-remote-success';
+export const CURRENT_SAVING_VEHICLE = 'current-saving-vehicle';
+export const ROOT_STORAGE_KEY = '@SavedVehicles';
+export const NO_VEHICLE_SAVED = 'no-vehicle-saved';
+export const LOADED_LOCAL_VEHICLES ='loaded-local-vehicles';
+export const SYNCHRONISING_VEHICLES = 'synchronising-vehicles';
+export const SYNCHRONISED_VEHICLES = 'synchronised-vehicles';
+export const SYNCHRONISATION_ERROR = 'error-occurred';
